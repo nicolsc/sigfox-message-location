@@ -1,0 +1,69 @@
+body{
+  padding:35px 0 35px 0;
+}
+
+.navbar, .navbar-inverse{
+  background: #028C7E;
+}
+.navbar-inverse{
+  border-color: #015D5B;
+}
+.navbar-inverse .navbar-toggle{
+  border-color: #fff;
+}
+
+
+.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:focus, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .open > a{
+  background: #015D5B;
+}
+.navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:focus, .navbar-inverse .navbar-nav>.active>a:hover{
+  background: #015D5B;
+}
+.navbar-brand{
+  padding:0 15px;
+}
+.navbar-brand img{
+  height:100%;
+}
+.navbar-inverse .navbar-nav > li > a{
+  color:#fff;
+}
+
+.navbar-inverse .navbar-toggle:focus, .navbar-inverse .navbar-toggle:hover{
+  background: #fff;
+  border-color: #015D5B;
+}
+.navbar-inverse .navbar-toggle:focus .icon-bar, .navbar-inverse .navbar-toggle:hover .icon-bar{
+  background: #028C7E;
+}
+
+
+#status{
+  margin-top:.5em;
+  padding:1em;
+  border-radius:4px;
+}
+
+td.stations pre{
+  max-height: 160px;
+  overflow: scroll;
+}
+
+.row-baseStation .map img{
+  margin: 4px;
+  outline: 1px solid #028C7E;
+}
+.footer {
+  position: fixed;
+  z-index:2;
+  font-size:12px;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 25px;
+  background-color: #028C7E;
+  color:#fff;
+}
+.footer p{
+  padding-top:4px;
+}

@@ -1,0 +1,29 @@
+{
+  "name": "message-localisation",
+  "version": "1.0.0",
+  "description": "Display localisation of messages sent by a SIGFOX device",
+  "keywords": "sigfox map",
+  "main": "server.js",
+  "dependencies":{
+    "body-parser": "1.12.4",
+    "debug": "2.2.0",
+    "ejs":  "2.3.1",
+    "express": "4.12.4",
+    "moment":"2.10.3",
+    "request-promise":"0.4.2"
+  },
+  "engines": {
+    "iojs": "2.2.1",
+    "npm": "2.11.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Nicolas Lesconnec",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nicolsc/"
+  },
+  "license": "ISC"
+}

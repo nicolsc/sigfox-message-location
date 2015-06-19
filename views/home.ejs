@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include includes/head %>
+    <script type="text/javascript">
+      //Nasty EJS stuff
+      var messages = <%- typeof data!=='undefined' ? JSON.stringify(data) : 'null'%>;
+    </script>
+  </head>
+
+  <body>
+    <%- include includes/nav %>
+    <div class="container-fluid">
+      <%- include includes/search %>
+      <%- include includes/map %>
+      <%- include includes/messages %>
+    </div>
+    <%- include includes/footer %>
+    <script src="/js/messages.js"></script>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%- include includes/head %>
+    <script type="text/javascript">
+      //Nasty EJS stuff
+      var baseStation = <%- typeof data!=='undefined' ? JSON.stringify(data) : 'null'%>;
+    </script>
+  </head>
+
+  <body>
+    <%- include includes/nav %>
+    <div class="container-fluid">
+      <%- include includes/search %>
+      <%- include includes/bsInfo %>
+    </div>
+    <%- include includes/footer %>
+    <script src="/js/baseStation.js"></script>
+  </body>
+</html>
