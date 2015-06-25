@@ -48,7 +48,21 @@ td.stations pre{
   max-height: 160px;
   overflow: scroll;
 }
-
+.modal-header{
+  background-color:#028C7E;
+  color: #fff;
+}
+.modal-dialog{
+  width:95%;
+}
+.modal-header .close{
+  color:#fff;
+  opacity: 1;
+}
+#modal-map #map{
+  height:600px;
+  width:100%;
+}
 .row-baseStation .map img{
   margin: 4px;
   outline: 1px solid #028C7E;

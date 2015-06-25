@@ -1,7 +1,8 @@
 (function(){
-  
   window.SIGFOX = {
     GMAPS_KEY : 'AIzaSyBPUHmaNk9Xb03ttmk7R46deW6XXaGdbck',
+    map: undefined,
+    markers: [],
     initDeviceSearch: function(){
       $('#btnSearchDeviceId').click(function(evt){
         this.showStatus('.. Please wait ..');
@@ -43,7 +44,7 @@
       .done(function(data){
         this.showMessages(deviceId, data);
       }.bind(this))
-      .fail(this.showError);
+      .fail(this.showError.bind(this));
 
     },
     showMessages: function(deviceId, messages){
@@ -56,12 +57,12 @@
       $('tbody', $messages).html('');
       var row;
       messages.forEach(function(msg){
-        row = '<tr>';
+        row = '<tr data-stations=\''+JSON.stringify(msg.rinfos)+'\'>';
         row += '<td class="date">'+moment(msg.time*1000).format()+'<br />'+moment(msg.time*1000).fromNow()+'</td>';
         row += '<td class="data">'+(msg.seqNumber ? msg.seqNumber : '-')+'</td>';
         row += '<td class="data">'+encodeURIComponent(msg.data)+'</td>';
         row += '<td class="stations">';
-        if (msg.rinfos && msginfos.rinfos.length){
+        if (msg.rinfos && msg.rinfos.length){
           row += msg.rinfos.length+' stations received this message<pre>';
           msg.rinfos.forEach(function(baseStation){
 
@@ -77,7 +78,7 @@
         }
         row += '</td>';
         row += '<td class="location">';
-        var map = this.getDeviceStaticMap(msg);
+        var map = this.getMessageStaticMap(msg);
         if (map){
           row += map;
         }
@@ -186,7 +187,7 @@
       // + cut at the last & to avoid incomplete params leading to unpredictable stuff, such as misplaced markers
       return '<img src="'+(uri+'&').substring(0,2048).replace(/\&([^\&])*$/, '')+'" />';
     },
-    getDeviceStaticMap: function(message, params){
+    getMessageStaticMap: function(message, params){
       if (!message || !message.rinfos || !message.rinfos.length){
         return null;
       }
@@ -203,6 +204,47 @@
       }.bind(this));
 
       return this.getStaticMapTag(uri);
+    },
+    setMessageMarkers: function(stations){
+      var marker;
+      
+      stations.forEach(function(station){
+        var marker = this.getMarker(station.lat, station.lng, this.getStationMarkerTooltip(station));
+        this.markers.push(marker);        
+      }.bind(this));
+      
+    },
+    getStationMarkerTooltip: function(station){
+      var str =  'Station '+station.tap+'\n'+station.lat+'°,'+station.lng+'°';
+      if (station.rssi){
+        str += "\n"+station.rssi+" dBm";
+      }
+      return str;
+      
+    },
+    getMarker: function(lat, lng, title){
+      return new google.maps.Marker({
+        map:this.map,
+        position: this.getLocation(lat, lng),
+        title : title || (lat+'°, '+lng+'°')
+      });
+    },
+    getLocation: function(lat, lng){
+      return new google.maps.LatLng(lat, lng);
+    },
+    fitMapToMarkers: function(){
+      var bounds = new google.maps.LatLngBounds();
+      this.markers.forEach(function(marker){
+        bounds.extend(marker.position);
+      });
+      this.map.fitBounds(bounds);
+    },
+    clearMarkers:function(){
+      this.markers.forEach(function(marker){
+        console.log('marker', marker)
+        marker.setMap(null);
+      });
+      this.markers = [];
     },
     getBaseStationStaticMap: function(baseStation, params){
       var uri = this.getStaticMap(params);
@@ -242,6 +284,26 @@
     },
     pushState: function(hash){
       window.history.pushState(hash, hash, hash);
+    },
+    loadMap: function(){
+      var script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&callback=gmapsCallback';
+      document.body.appendChild(script);
     }
+    
   };
+  
+  
 })();
+function gmapsCallback(){
+  $('.row-map').removeClass('hidden');
+
+  var options = {
+    center: new google.maps.LatLng(49,2),
+    zoom: 8
+  };
+  
+  SIGFOX.map = new google.maps.Map(document.getElementById('map'),options);
+  $('.row-map').addClass('hidden');
+}
