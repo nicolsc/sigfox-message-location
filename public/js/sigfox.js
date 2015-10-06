@@ -38,6 +38,7 @@
 
     },
     searchDevice: function(deviceId){
+      this.pushState('/devices/'+deviceId+'/messages');
       $.ajax({
         url: '/devices/'+deviceId+'/messages'
       })
@@ -57,10 +58,21 @@
       $('tbody', $messages).html('');
       var row;
       messages.forEach(function(msg){
-        row = '<tr data-stations=\''+JSON.stringify(msg.rinfos)+'\'>';
+        //GPS ? 
+        msg.location = getGPSCoords(msg.data);
+        
+        
+        row = '<tr data-stations=\''+JSON.stringify(msg.rinfos)+'\' data-location=\''+(this.getTextCoord(msg.location) || '')+'\'>';
         row += '<td class="date">'+moment(msg.time*1000).format()+'<br />'+moment(msg.time*1000).fromNow()+'</td>';
         row += '<td class="data">'+(msg.seqNumber ? msg.seqNumber : '-')+'</td>';
-        row += '<td class="data">'+encodeURIComponent(msg.data)+'</td>';
+        row += '<td class="data">';
+        row += encodeURIComponent(msg.data);
+        if (msg.location.lat){
+          row += '<br /><small>GPS ';
+          row += (Math.round(msg.location.lat*100)/100)+'° '+(Math.round(msg.location.lng*100)/100)+'°';
+          row += '</small>';
+        }
+        row += '</td>';
         row += '<td class="stations">';
         if (msg.rinfos && msg.rinfos.length){
           row += msg.rinfos.length+' stations received this message<pre>';
@@ -91,13 +103,33 @@
         $('tbody', $messages).append(row);
       }.bind(this));
 
-      this.pushState('/devices/'+deviceId+'/messages');
       $('h5 a', $messages).attr('href', window.location.pathname+'.csv');
-
+      this.initMsgListeners();
       $messages.removeClass('hidden');
 
 
       $('#status').hide(5000);
+    },
+    initMsgListeners: function(){
+      $('table#messages .location').on('click', function(evt){
+        this.clearMarkers();
+        var location = evt.currentTarget.parentNode.attributes['data-location'].value;
+        if (location){
+          location = location.split(',');
+          var marker = this.getMarker(location[0], location[1], 'GPS position '+location.join('°, ')+'°', 'green');
+          this.markers.push(marker);   
+        }
+        try{
+          var stations = JSON.parse(evt.currentTarget.parentNode.attributes['data-stations'].value);
+          this.setMessageMarkers(stations);
+        }
+        catch (e){
+          console.warn('Error wile parsing message stations ', e);
+        }
+        $('#modal-map').modal();
+        google.maps.event.trigger(map, 'resize');
+        this.fitMapToMarkers();
+      }.bind(this));
     },
     showBaseStationInfo:function(id, data){
       var $baseStation = $('.row-baseStation');
@@ -192,9 +224,12 @@
         return null;
       }
       
-      var markersColors = ["black", "brown", "green", "purple", "yellow", "blue", "gray", "orange", "red", "white"];
+      var markersColors = ["black", "brown","purple", "yellow", "blue", "gray", "orange", "red", "white"];
 
       var uri = this.getStaticMap(params);
+      if (message.location.lat){
+        uri += '&markers=size:mid%7ccolor:green%7C'+this.getTextCoord(message.location);
+      }
       message.rinfos.forEach(function(baseStation, idx){
         if (typeof baseStation.lat === 'undefined' || typeof baseStation.lng === 'undefined'){
           console.log('Base station location unknown', baseStation);
@@ -222,12 +257,20 @@
       return str;
       
     },
-    getMarker: function(lat, lng, title){
-      return new google.maps.Marker({
+    getMarker: function(lat, lng, title, color){
+      var options =  {
         map:this.map,
         position: this.getLocation(lat, lng),
         title : title || (lat+'°, '+lng+'°')
-      });
+      };
+      if (color){
+        options.icon =  {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 2,
+          strokeColor: color
+        };
+      }
+      return new google.maps.Marker(options);
     },
     getLocation: function(lat, lng){
       return new google.maps.LatLng(lat, lng);
@@ -241,7 +284,6 @@
     },
     clearMarkers:function(){
       this.markers.forEach(function(marker){
-        console.log('marker', marker)
         marker.setMap(null);
       });
       this.markers = [];
@@ -253,7 +295,7 @@
       return this.getStaticMapTag(uri);
     },
     getTextCoord: function(latLng){
-      if (!latLng || typeof latLng.lat==='undefined' || typeof latLng.lng==='undefined'){
+      if (!latLng || typeof latLng.lat==='undefined' || typeof latLng.lng==='undefined' || latLng.lat===null || latLng.lng===null){
         return null;
       }
       return latLng.lat+','+latLng.lng;
@@ -301,7 +343,8 @@ function gmapsCallback(){
 
   var options = {
     center: new google.maps.LatLng(49,2),
-    zoom: 8
+    zoom: 8,
+    mapTypeId: google.maps.MapTypeId.TERRAIN
   };
   
   SIGFOX.map = new google.maps.Map(document.getElementById('map'),options);
