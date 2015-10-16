@@ -35,8 +35,8 @@ Then, put your credentials using this syntax :
 ```
 module.exports = {
   DEBUG: 'message-localisation:*',
-  SIGFOX_USERNAME: '_{{username}}_',
-  SIGFOX_PASSWORD: '_{{password}}_'
+  SIGFOX_USERNAME: 'username',
+  SIGFOX_PASSWORD: 'password'
 };
 ```
 
