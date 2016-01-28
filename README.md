@@ -19,7 +19,7 @@ It displays (_italic_ : data available only to Sigfox admins):
 
 ##Access credentials
 
-You need two provide your SIGFOX API credentials for this to work.
+You need to provide your SIGFOX API credentials for this to work.
 
 You can do this two different ways :
 
@@ -35,8 +35,8 @@ Then, put your credentials using this syntax :
 ```
 module.exports = {
   DEBUG: 'message-localisation:*',
-  SIGFOX_USERNAME: '_{{username}}_',
-  SIGFOX_PASSWORD: '_{{password}}_'
+  SIGFOX_USERNAME: 'username',
+  SIGFOX_PASSWORD: 'password'
 };
 ```
 
