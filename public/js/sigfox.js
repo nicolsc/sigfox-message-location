@@ -90,7 +90,12 @@
         }
         row += '</td>';
         row += '<td class="location">';
-        var map = this.getMessageStaticMap(msg);
+        
+        var params = {};
+        if (msg.rinfos && msg.rinfos.length < 3){
+          params.zoom=10;
+        }
+        var map = this.getMessageStaticMap(msg, params);
         if (map){
           row += map;
         }
