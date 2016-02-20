@@ -9,6 +9,7 @@ const path = require('path');
 
 const SIGFOX =require('./modules/sigfox');
 const csv = require('./modules/csv');
+const auth = require('./modules/auth');
 
 /* init */
 const app = express();
@@ -27,6 +28,10 @@ SIGFOX.init(process.env.SIGFOX_USERNAME, process.env.SIGFOX_PASSWORD);
 
 
 server.listen(port);
+
+if (process.env.LOGIN && process.env.PASSWORD){
+  app.use('*',auth.basic);
+}
 
 
 
