@@ -1,6 +1,6 @@
 (function(){
   window.SIGFOX = {
-    GMAPS_KEY : 'AIzaSyBPUHmaNk9Xb03ttmk7R46deW6XXaGdbck',
+    GMAPS_KEY : 'AIzaSyAlNn4LPHQg1lxWN7RjT5M1PhcUBaYN47U',
     map: undefined,
     markers: [],
     initDeviceSearch: function(){
@@ -335,7 +335,7 @@
     loadMap: function(){
       var script = document.createElement('script');
       script.type = 'text/javascript';
-      script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&callback=gmapsCallback';
+      script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&callback=gmapsCallback&libraries=geometry&key='+this.GMAPS_KEY;
       document.body.appendChild(script);
     }
     
