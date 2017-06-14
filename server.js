@@ -150,7 +150,7 @@ app.use(function(req, res, next) {
 });
 
 app.use(function(err, req, res, next) {
-  debug('Err  ?'+err.status);
+  debug('Error  ? '+(err.status || 500));
   res.status(err.status || 500);
   res.format({
     json:function(){
