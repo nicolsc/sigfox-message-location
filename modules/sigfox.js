@@ -10,7 +10,8 @@ var SIGFOX = {
     this._password = password;
   },
   getDeviceMessages: function(deviceId){
-    return this._apiCall('devices/'+deviceId+'/messages');
+    var ts = Math.round(new Date().getTime() * 0.001);
+    return this._apiCall('devices/'+deviceId+'/messages?before='+ts);
   },
   getBaseStation: function(baseStationId){
     return this._apiCall('basestations/'+baseStationId);
