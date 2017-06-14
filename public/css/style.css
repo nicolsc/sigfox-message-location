@@ -3,10 +3,10 @@ body{
 }
 
 .navbar, .navbar-inverse{
-  background: #028C7E;
+  background: #230066;
 }
 .navbar-inverse{
-  border-color: #015D5B;
+  border-color: #8024FF;
 }
 .navbar-inverse .navbar-toggle{
   border-color: #fff;
@@ -14,10 +14,10 @@ body{
 
 
 .navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:focus, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .open > a{
-  background: #015D5B;
+  background: #8024FF;
 }
 .navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.active>a:focus, .navbar-inverse .navbar-nav>.active>a:hover{
-  background: #015D5B;
+  background: #8024FF;
 }
 .navbar-brand{
   padding:0 15px;
@@ -31,10 +31,10 @@ body{
 
 .navbar-inverse .navbar-toggle:focus, .navbar-inverse .navbar-toggle:hover{
   background: #fff;
-  border-color: #015D5B;
+  border-color: #8024FF;
 }
 .navbar-inverse .navbar-toggle:focus .icon-bar, .navbar-inverse .navbar-toggle:hover .icon-bar{
-  background: #028C7E;
+  background: #230066;
 }
 
 
@@ -49,7 +49,7 @@ td.stations pre{
   overflow: scroll;
 }
 .modal-header{
-  background-color:#028C7E;
+  background-color:#230066;
   color: #fff;
 }
 .modal-dialog{
@@ -65,7 +65,7 @@ td.stations pre{
 }
 .row-baseStation .map img{
   margin: 4px;
-  outline: 1px solid #028C7E;
+  outline: 1px solid #230066;
 }
 .footer {
   position: fixed;
@@ -75,7 +75,7 @@ td.stations pre{
   width: 100%;
   /* Set the fixed height of the footer here */
   height: 25px;
-  background-color: #028C7E;
+  background-color: #230066;
   color:#fff;
 }
 .footer p{
