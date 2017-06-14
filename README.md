@@ -1,6 +1,6 @@
-#SIGFOX Admin — message localisation
+# SIGFOX Admin — message localisation
 
-##Description
+## Description
 
 Simple NodeJS application that uses the SIGFOX API to display recent messages from a given device.
 
@@ -12,19 +12,19 @@ It displays (_italic_ : data available only to Sigfox admins):
 * List of stations having received this message, with the matching RSSI & _coordinates_
 * _Map of the BTS that received the message_
 
-##Install
+## Install
 
 * Install [NodeJS](http://nodejs.org/)
 * Run `$ npm install`
 
-##Access credentials
+## Access credentials
 
 You need to provide your SIGFOX API credentials for this to work.
 
 You can do this two different ways :
 
 
-###Local file
+### Local file
 
 **Use with caution**
 
@@ -40,7 +40,7 @@ module.exports = {
 };
 ```
 
-###Environment variables
+### Environment variables
 
 You need to manually set up these two env vars :
 
@@ -48,7 +48,7 @@ You need to manually set up these two env vars :
 * `SIGFOX_PASSWORD`
 
 
-##Run
+## Run
 
 ```
 $ npm start
