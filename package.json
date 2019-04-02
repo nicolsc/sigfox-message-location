@@ -7,10 +7,10 @@
   "dependencies": {
     "basic-auth": "^1.0.3",
     "body-parser": "1.12.4",
-    "debug": "2.2.0",
-    "ejs": "2.3.1",
+    "debug": "2.6.9",
+    "ejs": "2.5.5",
     "express": "4.12.4",
-    "moment": "2.10.3",
+    "moment": "2.19.3",
     "request-promise": "0.4.2"
   },
   "engines": {
