@@ -5,6 +5,7 @@
     <script type="text/javascript">
       //Nasty EJS stuff
       var baseStation = <%- typeof data!=='undefined' ? JSON.stringify(data) : 'null'%>;
+      var conf = <%- typeof conf!=='undefined' && typeof conf!=='undefined' ? JSON.stringify(conf) : 'null'%>;
     </script>
   </head>
 

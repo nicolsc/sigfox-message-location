@@ -1,6 +1,5 @@
 (function(){
   window.SIGFOX = {
-    GMAPS_KEY : 'AIzaSyAlNn4LPHQg1lxWN7RjT5M1PhcUBaYN47U',
     map: undefined,
     markers: [],
     initDeviceSearch: function(){
@@ -58,12 +57,12 @@
       $('tbody', $messages).html('');
       var row;
       messages.forEach(function(msg){
-        //GPS ? 
+        //GPS ?
         msg.location = getGPSCoords(msg.data);
-        
-        
+
+
         row = '<tr data-stations=\''+JSON.stringify(msg.rinfos)+'\' data-location=\''+(this.getTextCoord(msg.location) || '')+'\'>';
-        row += '<td class="date">'+moment(msg.time*1000).format()+'<br />'+moment(msg.time*1000).fromNow()+'</td>';
+        row += '<td class="date">'+moment(msg.time).format()+'<br />'+moment(msg.time).fromNow()+'</td>';
         row += '<td class="data">'+(msg.seqNumber ? msg.seqNumber : '-')+'</td>';
         row += '<td class="data">';
         row += encodeURIComponent(msg.data);
@@ -78,7 +77,7 @@
           row += msg.rinfos.length+' stations received this message<pre>';
           msg.rinfos.forEach(function(baseStation){
 
-            row += '<a href="/basestations/'+baseStation.tap+'">'+baseStation.tap+' ('+ baseStation.rssi +'dBm)</a>';
+            row += '<a href="/basestations/'+baseStation.baseStation.id+'">'+baseStation.baseStation.id+' ('+ baseStation.rssi +'dBm)</a>';
             row += '&nbsp;\t'+(Math.floor(baseStation.lat*100)/100)+','+(Math.floor(baseStation.lng*100)/100)+'°';
             //row += '\t'+baseStation.lat+' , '+baseStation.lng;
             row += '\n';
@@ -90,7 +89,7 @@
         }
         row += '</td>';
         row += '<td class="location">';
-        
+
         var params = {};
         if (msg.rinfos && msg.rinfos.length < 3){
           params.zoom=10;
@@ -122,7 +121,7 @@
         if (location){
           location = location.split(',');
           var marker = this.getMarker(location[0], location[1], 'GPS position '+location.join('°, ')+'°', 'green');
-          this.markers.push(marker);   
+          this.markers.push(marker);
         }
         try{
           var stations = JSON.parse(evt.currentTarget.parentNode.attributes['data-stations'].value);
@@ -139,7 +138,7 @@
     showBaseStationInfo:function(id, data){
       var $baseStation = $('.row-baseStation');
       $('h3', $baseStation).text('Base station '+id);
-      
+
       var toDisplay = [];
       toDisplay.push({
         label : "Name",
@@ -160,7 +159,7 @@
       toDisplay.push({
         label : "State",
         value : data.state,
-        css : data.state === 'OK' ? 'success' : 'danger' 
+        css : data.state === 'OK' ? 'success' : 'danger'
       });
       toDisplay.push({
         label : "Downlink enabled",
@@ -170,23 +169,23 @@
         label : "Connection",
         value : data.connection
       });
-      
-      
+
+
       var html = '', css;
       toDisplay.forEach(function(entry){
         css = (typeof entry.css !== 'undefined' ? entry.css : '');
         html += "<tr><th class='"+css+"'>"+entry.label+"</th><td class='"+css+"'>"+entry.value+"</td>";
       });
-      
+
       $('.info table', $baseStation).html(html);
-      
+
       $('.map', $baseStation).html(
         SIGFOX.getBaseStationStaticMap(data, {zoom:5, size:'275x225'})
         +
         SIGFOX.getBaseStationStaticMap(data, {zoom:11, size:'275x225'})
       );
-      
-      
+
+
     },
     getStaticMap: function(params){
         var defaultParams = {
@@ -203,20 +202,16 @@
         }
       });
 
-      var uri = 'https://maps.googleapis.com/maps/api/staticmap?key='+this.GMAPS_KEY+'&size={size}&maptype={mapType}';
-      //uri = uri.replace('{center}', getStaticMapCoord(params.center));
-      
-      uri = uri.replace('{mapType}', params.type);
-      uri = uri.replace('{size}', params.size);
-      
+      var uri = `https://maps.googleapis.com/maps/api/staticmap?key=${window.conf.GMAPS_KEY}&size=${params.size}&maptype=${params.type}`;
+
       if (params.zoom){
         uri += "&zoom="+params.zoom;
       }
-      
+
       if (params.center){
         uri += '&center='+this.getTextCoord(params.center);
       }
-      
+
       return uri;
     },
     getStaticMapTag: function(uri){
@@ -228,31 +223,37 @@
       if (!message || !message.rinfos || !message.rinfos.length){
         return null;
       }
-      
+
       var markersColors = ["black", "brown","purple", "yellow", "blue", "gray", "orange", "red", "white"];
 
       var uri = this.getStaticMap(params);
       if (message.location.lat){
         uri += '&markers=size:mid%7ccolor:green%7C'+this.getTextCoord(message.location);
       }
+      else if (message.computedLocation && message.computedLocation.length){
+        uri += '&markers=size:mid%7ccolor:green%7C'+this.getTextCoord(message.computedLocation);
+      }
       message.rinfos.forEach(function(baseStation, idx){
         if (typeof baseStation.lat === 'undefined' || typeof baseStation.lng === 'undefined'){
           console.log('Base station location unknown', baseStation);
           return;
         }
-        uri += '&markers=size:mid%7ccolor:'+markersColors[idx%markersColors.length]+'%7C'+this.getTextCoord(baseStation);
-      }.bind(this));
+        var coord = this.getTextCoord(baseStation);
+        if (coord){
+            uri += '&markers=size:mid%7ccolor:'+markersColors[idx%markersColors.length]+'%7C'+coord;
+        }
 
+      }.bind(this));
       return this.getStaticMapTag(uri);
     },
     setMessageMarkers: function(stations){
       var marker;
-      
+
       stations.forEach(function(station){
         var marker = this.getMarker(station.lat, station.lng, this.getStationMarkerTooltip(station));
-        this.markers.push(marker);        
+        this.markers.push(marker);
       }.bind(this));
-      
+
     },
     getStationMarkerTooltip: function(station){
       var str =  'Station '+station.tap+'\n'+station.lat+'°,'+station.lng+'°';
@@ -260,7 +261,7 @@
         str += "\n"+station.rssi+" dBm";
       }
       return str;
-      
+
     },
     getMarker: function(lat, lng, title, color){
       var options =  {
@@ -296,11 +297,11 @@
     getBaseStationStaticMap: function(baseStation, params){
       var uri = this.getStaticMap(params);
       uri += '&markers=size:mid%7ccolor:green%7C'+this.getTextCoord({lat:baseStation.latitude, lng:baseStation.longitude});
-      
+
       return this.getStaticMapTag(uri);
     },
     getTextCoord: function(latLng){
-      if (!latLng || typeof latLng.lat==='undefined' || typeof latLng.lng==='undefined' || latLng.lat===null || latLng.lng===null){
+      if (!latLng || !latLng.lat || !latLng.lng){
         return null;
       }
       return latLng.lat+','+latLng.lng;
@@ -335,13 +336,13 @@
     loadMap: function(){
       var script = document.createElement('script');
       script.type = 'text/javascript';
-      script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&callback=gmapsCallback&libraries=geometry&key='+this.GMAPS_KEY;
+      script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&callback=gmapsCallback&libraries=geometry&key='+window.conf.GMAPS_KEY;
       document.body.appendChild(script);
     }
-    
+
   };
-  
-  
+
+
 })();
 function gmapsCallback(){
   $('.row-map').removeClass('hidden');
@@ -351,7 +352,7 @@ function gmapsCallback(){
     zoom: 8,
     mapTypeId: google.maps.MapTypeId.TERRAIN
   };
-  
+
   SIGFOX.map = new google.maps.Map(document.getElementById('map'),options);
   $('.row-map').addClass('hidden');
 }

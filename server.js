@@ -36,14 +36,14 @@ if (process.env.LOGIN && process.env.PASSWORD){
 
 
 app.get('/', function(req, res, next){
- res.render('home');
+ res.render('home',{conf:{GMAPS_KEY:process.env.GMAPS_KEY}});
 });
 app.get('/devices/:deviceid/messages\.:extension?', function(req, res, next){
   debug('/messages routes');
   debug('deviceid\t:\t'+req.params.deviceid);
   debug('extension\t:\t'+req.params.extension);
-  
-  
+
+
   //If an explicit extension is provided, simulate the matching request headers
   switch(req.params.extension){
     case 'json':
@@ -59,7 +59,7 @@ app.get('/devices/:deviceid/messages\.:extension?', function(req, res, next){
         //do nothing
   }
   debug(req.headers.accept);
-  
+
   SIGFOX.getDeviceMessages(req.params.deviceid)
   .then(function(response){
     let messages;
@@ -75,22 +75,21 @@ app.get('/devices/:deviceid/messages\.:extension?', function(req, res, next){
         res.json(messages);
       },
       html:function(){
-        res.render('home', {data:messages});
+        res.render('home', {data:messages, conf:{GMAPS_KEY:process.env.GMAPS_KEY}});
       },
       csv: function(){
-        //Format for csv exports 
+        //Format for csv exports
         let csv = [];
-        //Line 1 : headers  
+        //Line 1 : headers
         csv.push(['device', 'msgSequenceNumber', 'date', 'payload', 'baseStationID', 'baseStationLat', 'baseStationLng', 'rssi']);
         messages.forEach(function(entry){
           entry.rinfos.forEach(function(baseStation){
-            debug('bs', baseStation.tap);
-            csv.push([entry.device, entry.seqNumber, new Date(entry.time*1000).toISOString(), entry.data, baseStation.tap, baseStation.lat, baseStation.lng, baseStation.rssi]);
+            csv.push([entry.device.id, entry.seqNumber, new Date(entry.time*1000).toISOString(), entry.data, baseStation.baseStation.id, baseStation.lat, baseStation.lng, baseStation.rssi]);
           });
         });
-        
-        
-        
+
+
+
         res.csv(csv, 'devices-'+req.params.deviceid+'-messages.csv');
       }
     });
@@ -104,8 +103,8 @@ app.get('/basestations/:id\.:extension?', function(req, res, next){
   debug('/basestations routes');
   debug('deviceid\t:\t'+req.params.id);
   debug('extension\t:\t'+req.params.extension);
-  
-  
+
+
   //If an explicit extension is provided, simulate the matching request headers
   switch(req.params.extension){
     case 'json':
@@ -120,18 +119,18 @@ app.get('/basestations/:id\.:extension?', function(req, res, next){
     default:
         //do nothing
   }
-  
-  
+
+
   SIGFOX.getBaseStation(req.params.id)
   .then(function(response){
-    
+
     res.format({
       //default */* to json
       json: function(){
         res.json(response);
       },
       html:function(){
-        res.render('basestation', {data:response});
+        res.render('basestation', {data:response, conf:{GMAPS_KEY:process.env.GMAPS_KEY}});
       }
     });
   })
@@ -171,5 +170,5 @@ server.on('error', function(err){
     debug('ERROR %s', err);
 });
 server.on('listening', function(){
- debug('Server listening on port %s', port); 
+ debug('Server listening on port %s', port);
 });
