@@ -62,7 +62,7 @@
 
 
         row = '<tr data-stations=\''+JSON.stringify(msg.rinfos)+'\' data-location=\''+(this.getTextCoord(msg.location) || '')+'\'>';
-        row += '<td class="date">'+moment(msg.time*1000).format()+'<br />'+moment(msg.time*1000).fromNow()+'</td>';
+        row += '<td class="date">'+moment(msg.time).format()+'<br />'+moment(msg.time).fromNow()+'</td>';
         row += '<td class="data">'+(msg.seqNumber ? msg.seqNumber : '-')+'</td>';
         row += '<td class="data">';
         row += encodeURIComponent(msg.data);
@@ -77,7 +77,7 @@
           row += msg.rinfos.length+' stations received this message<pre>';
           msg.rinfos.forEach(function(baseStation){
 
-            row += '<a href="/basestations/'+baseStation.tap+'">'+baseStation.tap+' ('+ baseStation.rssi +'dBm)</a>';
+            row += '<a href="/basestations/'+baseStation.baseStation.id+'">'+baseStation.baseStation.id+' ('+ baseStation.rssi +'dBm)</a>';
             row += '&nbsp;\t'+(Math.floor(baseStation.lat*100)/100)+','+(Math.floor(baseStation.lng*100)/100)+'°';
             //row += '\t'+baseStation.lat+' , '+baseStation.lng;
             row += '\n';
@@ -202,11 +202,7 @@
         }
       });
 
-      var uri = 'https://maps.googleapis.com/maps/api/staticmap?key='+window.conf.GMAPS_KEY+'&size={size}&maptype={mapType}';
-      //uri = uri.replace('{center}', getStaticMapCoord(params.center));
-
-      uri = uri.replace('{mapType}', params.type);
-      uri = uri.replace('{size}', params.size);
+      var uri = `https://maps.googleapis.com/maps/api/staticmap?key=${window.conf.GMAPS_KEY}&size=${params.size}&maptype=${params.type}`;
 
       if (params.zoom){
         uri += "&zoom="+params.zoom;
@@ -234,7 +230,7 @@
       if (message.location.lat){
         uri += '&markers=size:mid%7ccolor:green%7C'+this.getTextCoord(message.location);
       }
-      else if (message.computedLocation){
+      else if (message.computedLocation && message.computedLocation.length){
         uri += '&markers=size:mid%7ccolor:green%7C'+this.getTextCoord(message.computedLocation);
       }
       message.rinfos.forEach(function(baseStation, idx){
@@ -242,9 +238,12 @@
           console.log('Base station location unknown', baseStation);
           return;
         }
-        uri += '&markers=size:mid%7ccolor:'+markersColors[idx%markersColors.length]+'%7C'+this.getTextCoord(baseStation);
-      }.bind(this));
+        var coord = this.getTextCoord(baseStation);
+        if (coord){
+            uri += '&markers=size:mid%7ccolor:'+markersColors[idx%markersColors.length]+'%7C'+coord;
+        }
 
+      }.bind(this));
       return this.getStaticMapTag(uri);
     },
     setMessageMarkers: function(stations){
@@ -302,7 +301,7 @@
       return this.getStaticMapTag(uri);
     },
     getTextCoord: function(latLng){
-      if (!latLng || typeof latLng.lat==='undefined' || typeof latLng.lng==='undefined' || latLng.lat===null || latLng.lng===null){
+      if (!latLng || !latLng.lat || !latLng.lng){
         return null;
       }
       return latLng.lat+','+latLng.lng;

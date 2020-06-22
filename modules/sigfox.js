@@ -4,13 +4,13 @@ const debug = require('debug')('message-localisation:sigfox');
 var SIGFOX = {
   _username : undefined,
   _password : undefined,
-  _apiRoot : 'https://backend.sigfox.com/api/',
+  _apiRoot : 'https://api.sigfox.com/v2/',
   init: function(username, password){
     this._username = username;
     this._password = password;
   },
   getDeviceMessages: function(deviceId){
-    var ts = Math.round(new Date().getTime() * 0.001);
+    var ts = Math.round(new Date().getTime());
     return this._apiCall('devices/'+deviceId+'/messages?before='+ts);
   },
   getBaseStation: function(baseStationId){
@@ -28,7 +28,7 @@ var SIGFOX = {
       })
       .then(resolve)
       .catch(reject);
-      
+
     }.bind(this));
   },
   isValidDeviceId: function(deviceId){
