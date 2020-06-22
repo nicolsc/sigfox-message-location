@@ -4,7 +4,7 @@
     <%- include includes/head %>
     <script type="text/javascript">
       //Nasty EJS stuff
-      var messages = <%- typeof data!=='undefined' ? JSON.stringify(data) : 'null'%>;
+      var messages = <%- typeof data!=='undefined' && typeof data!=='undefined' ? JSON.stringify(data) : 'null'%>;
     </script>
   </head>
 
